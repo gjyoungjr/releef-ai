@@ -7,6 +7,16 @@ ECR_REPO=public.ecr.aws/y9j1k7y7
 IMAGE_NAME=nucleus
 
 
+## Terraform commands
+tf-init:
+	terraform -chdir=infrastructure init
+
+tf-plan:
+	terraform -chdir=infrastructure plan
+
+tf-apply:
+	terraform -chdir=infrastructure apply -auto-approve
+
 ## Build and push docker image to ECR 
 docker-login:
 	aws  ecr-public get-login-password --region ${REGION} --profile ${AWS_PROFILE} | docker login --username AWS --password-stdin ${ECR_REPO}
