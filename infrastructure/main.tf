@@ -25,8 +25,8 @@ resource "aws_security_group" "ecs_sg" {
   name   = "ecs-security-group"
   # Inbound and outbound rules
   ingress {
-    from_port   = 8000
-    to_port     = 8000
+    from_port   = 5000
+    to_port     = 5000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -82,8 +82,8 @@ resource "aws_ecs_task_definition" "task_definition" {
       memory = 512
       port_mappings = [
         {
-          container_port = 8000
-          host_port      = 8000
+          container_port = 5000
+          host_port      = 5000
           protocol       = "tcp"
         }
       ]
