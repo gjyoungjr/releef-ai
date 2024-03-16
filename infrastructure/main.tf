@@ -25,8 +25,8 @@ resource "aws_security_group" "ecs_sg" {
   name   = "ecs-security-group"
   # Inbound and outbound rules
   ingress {
-    from_port   = 5000
-    to_port     = 5000
+    from_port   = 8000
+    to_port     = 8000
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -82,11 +82,28 @@ resource "aws_ecs_task_definition" "task_definition" {
       memory = 512
       port_mappings = [
         {
-          container_port = 5000
-          host_port      = 5000
+          container_port = 8000
+          host_port      = 8000
           protocol       = "tcp"
         }
       ]
+      log_configuration = {
+        log_driver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/nucleus-api-task" # Replace with your desired log group name
+          "awslogs-region"        = "us-east-1"             # Replace with your desired AWS region
+          "awslogs-stream-prefix" = "nucleus-api-container" # Replace with your desired log stream prefix
+          "awslogs-create-group"  = "true"
+        }
+      }
+      healthcheck = {
+        command      = ["CMD-SHELL", "curl -f http://localhost:5000 || exit 1"]
+        interval     = 30
+        retries      = 3
+        start_period = 60
+        timeout      = 5
+      }
+
     }
   ])
 

@@ -8,4 +8,4 @@ EXPOSE 5000
 
 ENV PYTHONUNBUFFERED=1
 
-CMD ["python" ,"main.py"]
+CMD ["python" ,"main.py", "--host=0.0.0.0"]
