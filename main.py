@@ -1,10 +1,10 @@
-from flask import Flask, request, jsonify
-from services.extract import extract_blueprint
+from flask import Flask
+from services.ingest import ingest_blueprint
 
 app = Flask(__name__)
 
 # Register the blueprints/routes
-app.register_blueprint(extract_blueprint, url_prefix='/extract')
+app.register_blueprint(ingest_blueprint, url_prefix='/')
 
 
 @app.route('/')
@@ -13,4 +13,4 @@ def home():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=8000, debug=True)
