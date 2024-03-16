@@ -19,6 +19,13 @@ data "aws_vpc" "existing" {
   id = "vpc-0ba210283f5399e2d"
 }
 
+variable "cloudwatch_group" {
+  description = "CloudWatch group name."
+  type        = string
+  default     = "/ecs/nucleus-api-task"
+}
+
+
 # Security group for the ECS tasks
 resource "aws_security_group" "ecs_sg" {
   vpc_id = data.aws_vpc.existing.id
@@ -87,23 +94,15 @@ resource "aws_ecs_task_definition" "task_definition" {
           protocol       = "tcp"
         }
       ]
-      log_configuration = {
-        log_driver = "awslogs"
+      logConfiguration = {
+        logDriver = "awslogs"
         options = {
-          "awslogs-group"         = "/ecs/nucleus-api-task" # Replace with your desired log group name
-          "awslogs-region"        = "us-east-1"             # Replace with your desired AWS region
-          "awslogs-stream-prefix" = "nucleus-api-container" # Replace with your desired log stream prefix
+          "awslogs-group"         = "${var.cloudwatch_group}"
+          "awslogs-region"        = "us-east-1"
+          "awslogs-stream-prefix" = "nucleus-api-container"
           "awslogs-create-group"  = "true"
         }
       }
-      healthcheck = {
-        command      = ["CMD-SHELL", "curl -f http://localhost:5000 || exit 1"]
-        interval     = 30
-        retries      = 3
-        start_period = 60
-        timeout      = 5
-      }
-
     }
   ])
 
@@ -114,6 +113,10 @@ resource "aws_ecs_task_definition" "task_definition" {
 # ECS service
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "nucleus-api-cluster"
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
 
 resource "aws_ecs_service" "service" {
@@ -122,6 +125,7 @@ resource "aws_ecs_service" "service" {
   task_definition = aws_ecs_task_definition.task_definition.arn
   desired_count   = 1
   launch_type     = "FARGATE"
+
 
   # Network configuration
   network_configuration {
