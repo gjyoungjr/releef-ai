@@ -1,6 +1,6 @@
 resource "aws_lb" "default" {
   name            = "${var.service}-lb"
-  subnets         = var.subnet_ids
+  subnets         = var.public_subnet_ids
   security_groups = [var.security_group_id]
 }
 
