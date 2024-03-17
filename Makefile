@@ -29,3 +29,7 @@ docker-tag:
 
 docker-push: 
 	docker push ${ECR_REPO}/${IMAGE_NAME}:latest
+
+docker-deploy: docker-login docker-build docker-tag docker-push
+
+deploy-terraform: tf-init tf-plan tf-apply
