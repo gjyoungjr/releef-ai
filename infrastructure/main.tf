@@ -25,6 +25,14 @@ module "ecs" {
   vpc_id             = module.vpc.vpc_id
 }
 
+module "api_gateway" {
+  source                     = "./resources/api-gateway"
+  service                    = var.service
+  private_subnet_ids         = module.vpc.private_subnet_ids
+  vpc_id                     = module.vpc.vpc_id
+  security_group_id          = module.vpc.security_group_id
+  load_balancer_listener_arn = module.load_balancer.load_balancer_listener_arn
+}
 
 
 
