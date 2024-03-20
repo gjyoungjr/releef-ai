@@ -1,3 +1,49 @@
+
+# IAM Role
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecs-task-execution-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+}
+
+# IAM Role Policy
+resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+
+# Security group for the ECS tasks
+resource "aws_security_group" "ecs_sg" {
+  vpc_id = var.vpc_id
+  name   = "ecs-security-group"
+  # Inbound and outbound rules
+  ingress {
+    from_port   = 5000
+    to_port     = 5000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+
+
 # ECS Cluster 
 resource "aws_ecs_cluster" "cluster" {
   name = "${var.service}-cluster"
@@ -19,81 +65,50 @@ resource "aws_ecs_service" "service" {
 
   # Network configuration
   network_configuration {
-    subnets          = ["subnet-08f44ddd389841e62", "subnet-0ead33dd53ff8e157", "subnet-048bc660539c34193", "subnet-0385858ae166b9498"] # Replace "subnet-XXX" with your subnet IDs
-    security_groups  = [aws_security_group.ecs_sg.id]
-    assign_public_ip = true
+    subnets         = var.private_subnet_ids
+    security_groups = [aws_security_group.ecs_sg.id]
   }
+
 }
 
 
 
 
-# resource "aws_ecs_task_definition" "hello_world" {
-#   family                   = "hello-world-app"
-#   network_mode             = "awsvpc"
-#   requires_compatibilities = ["FARGATE"]
-#   cpu                      = 1024
-#   memory                   = 2048
+resource "aws_ecs_task_definition" "task_definition" {
+  family                   = "${var.service}-task"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = 1024
+  memory                   = 2048
 
-#   container_definitions = <<DEFINITION
-# [
-#   {
-#     "image": "registry.gitlab.com/architect-io/artifacts/nodejs-hello-world:latest",
-#     "cpu": 1024,
-#     "memory": 2048,
-#     "name": "hello-world-app",
-#     "networkMode": "awsvpc",
-#     "portMappings": [
-#       {
-#         "containerPort": 3000,
-#         "hostPort": 3000
-#       }
-#     ]
-#   }
-# ]
-# DEFINITION
-# }
+  # Task execution role 
+  execution_role_arn = aws_iam_role.ecs_task_execution_role.arn
 
-# resource "aws_security_group" "hello_world_task" {
-#   name   = "do4m-task-sg"
-#   vpc_id = aws_vpc.default.id
+  # Container definition
+  container_definitions = jsonencode([
+    {
+      name   = "${var.service}-container"
+      image  = "public.ecr.aws/y9j1k7y7/nucleus:latest"
+      cpu    = 256
+      memory = 512
+      port_mappings = [
+        {
+          container_port = 5000
+          host_port      = 5000
+          protocol       = "tcp"
+        }
+      ]
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = "/ecs/${var.service}-task"
+          "awslogs-region"        = "us-east-1"
+          "awslogs-stream-prefix" = "${var.service}-container"
+          "awslogs-create-group"  = "true"
+        }
+      }
+    }
+  ])
 
-#   ingress {
-#     protocol        = "tcp"
-#     from_port       = 3000
-#     to_port         = 3000
-#     security_groups = [aws_security_group.lb.id]
-#   }
+}
 
-#   egress {
-#     protocol    = "-1"
-#     from_port   = 0
-#     to_port     = 0
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
-
-# resource "aws_ecs_cluster" "main" {
-#   name = "do4m-cluster"
-# }
-
-# resource "aws_ecs_service" "hello_world" {
-#   name            = "hello-world-service"
-#   cluster         = aws_ecs_cluster.main.id
-#   task_definition = aws_ecs_task_definition.hello_world.arn
-#   desired_count   = var.app_count
-#   launch_type     = "FARGATE"
-
-#   network_configuration {
-#     security_groups = [aws_security_group.hello_world_task.id]
-#     subnets         = aws_subnet.private.*.id
-#   }
-
-#   load_balancer {
-#     target_group_arn = aws_lb_target_group.hello_world.id
-#     container_name   = "hello-world-app"
-#     container_port   = 3000
-#   }
-
-#   depends_on = [aws_lb_listener.hello_world]
-# }
