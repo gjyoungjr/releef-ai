@@ -21,3 +21,11 @@ pip install -r requirements.txt
 ```bash
 python3 main.py
 ```
+
+## Deploy
+
+[Pulumi](https://pulumi/documenation) manages our Fargate tasks/containers.
+
+```bash
+pulumi up
+```

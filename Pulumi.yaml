@@ -18,7 +18,7 @@ resources:
   # An ECS cluster to deploy into
   cluster:
     type: aws:ecs:Cluster
-  # Build and publish our application's container image from ./app to the ECR repository
+  # Build and publish our application's container image from root directory to the ECR repository
   image:
     properties:
       context: .
