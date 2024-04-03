@@ -22,3 +22,6 @@ docker-push:
 # Full deploy commands
 docker-deploy: docker-login docker-build docker-tag docker-push
 
+# Pulumi commands
+pulumi-deploy: 
+	pulumi up --yes

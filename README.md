@@ -24,7 +24,7 @@ python3 main.py
 
 ## Deploy
 
-[Pulumi](https://pulumi/documenation) manages our Fargate tasks/containers.
+[Pulumi](https://www.pulumi.com/templates/container-service/aws/) manages our Fargate tasks/containers.
 
 ```bash
 pulumi up
