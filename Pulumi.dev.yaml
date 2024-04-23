@@ -1,6 +1,0 @@
-config:
-  aws:profile: perennial
-  aws:region: us-east-1
-  nucleus:containerPort: "80"
-  nucleus:cpu: "512"
-  nucleus:memory: "128"

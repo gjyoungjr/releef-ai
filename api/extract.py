@@ -28,7 +28,6 @@ def ingest():
         key = request_body["file_key"]
         bucket = request_body["bucket"]
 
-        # Get the file from S3
         s3_response = s3_client.get_object(Bucket=bucket, Key=key)
         
         file_stream = s3_response["Body"].read() 
@@ -41,7 +40,6 @@ def ingest():
         return jsonify({"status": "ok", "data": data}), 200
 
     except Exception as e:
-        # Handle any exceptions
         return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
