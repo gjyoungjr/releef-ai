@@ -22,6 +22,10 @@ docker-push:
 # Full deploy commands
 docker-deploy: docker-login docker-build docker-tag docker-push
 
-# Pulumi commands
-pulumi-deploy: 
-	pulumi up --yes
+# CDK commands
+cdk-deploy:
+	cd infrastructure && cdk deploy --profile ${AWS_PROFILE} --require-approval never
+
+cdk-bootstrap:
+	cd infrastructure && cdk bootstrap --profile ${AWS_PROFILE}
+
