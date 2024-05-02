@@ -1,5 +1,6 @@
 langchain
 langchain-openai
+langchain_core
 python-dotenv
 flask
 boto3
