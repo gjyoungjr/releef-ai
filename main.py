@@ -8,8 +8,13 @@ app.register_blueprint(extract_blueprint, url_prefix='/')
 
 
 @app.route('/')
-def home():
-    return 'Go Perennial <33', 200
+def default():
+    return 'OK', 200
+
+
+@app.route('/health')
+def health_check():
+    return 'OK', 200
 
 
 if __name__ == '__main__':

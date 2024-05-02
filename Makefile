@@ -24,8 +24,8 @@ docker-deploy: docker-login docker-build docker-tag docker-push
 
 # CDK commands
 cdk-deploy:
-	cd infrastructure && cdk deploy --profile ${AWS_PROFILE} --require-approval never
+	cd infra && cdk deploy --profile ${AWS_PROFILE} --require-approval never
 
 cdk-bootstrap:
-	cd infrastructure && cdk bootstrap --profile ${AWS_PROFILE}
+	cd infra && cdk bootstrap --profile ${AWS_PROFILE}
 
