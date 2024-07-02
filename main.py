@@ -1,10 +1,10 @@
 from flask import Flask
-from api.query import extract_blueprint
+from api.query import query_blueprint
 
 app = Flask(__name__)
 
 # Register the blueprints/routes
-app.register_blueprint(extract_blueprint, url_prefix='/')
+app.register_blueprint(query_blueprint, url_prefix='/')
 
 
 @app.route('/')

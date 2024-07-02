@@ -6,8 +6,8 @@ import os
 
 load_dotenv()
 
-extract_blueprint = Blueprint("query", __name__)
-@extract_blueprint.route("/query", methods=["POST"])
+query_blueprint = Blueprint("query", __name__)
+@query_blueprint.route("/query", methods=["POST"])
 def ingest():
     """
     Executes a similarity search on pinecone vector store.
