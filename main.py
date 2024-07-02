@@ -1,5 +1,5 @@
 from flask import Flask
-from api.extract import extract_blueprint
+from api.query import extract_blueprint
 
 app = Flask(__name__)
 
