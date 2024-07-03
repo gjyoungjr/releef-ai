@@ -4,7 +4,9 @@ AWS_ACCOUNT=654654323576
 AWS_PROFILE=perennial
 REGION=us-east-1
 ECR_REPO=public.ecr.aws/y9j1k7y7
-IMAGE_NAME=nucleus
+IMAGE_NAME=esgene-rag
+
+## docker run -p 8000:8000 esgene-rag  
 
 # Build and push docker image to ECR 
 docker-login:

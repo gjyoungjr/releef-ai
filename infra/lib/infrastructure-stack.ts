@@ -33,9 +33,9 @@ export class InfrastructureStack extends cdk.Stack {
 
     // CloudMap Namespace
     const dnsNamespace = new PrivateDnsNamespace(this, "DNSNamespace", {
-      name: "nucleus-api.local",
+      name: "esgene-api.local",
       vpc,
-      description: "Private DNS Namespace for Nucleus API",
+      description: "Private DNS Namespace for ESGene API",
     });
 
     // Task Role
@@ -51,7 +51,7 @@ export class InfrastructureStack extends cdk.Stack {
     // Task Definitions
     const taskDef = new ecs.FargateTaskDefinition(
       this,
-      "nucleusTaskDefinition",
+      "esgeneTaskDefinition",
       {
         memoryLimitMiB: 512,
         cpu: 256,
@@ -60,28 +60,28 @@ export class InfrastructureStack extends cdk.Stack {
     );
 
     // Log Groups
-    const logGroup = new log.LogGroup(this, "nucleusLogGroup", {
-      logGroupName: "/ecs/nucleus",
+    const logGroup = new log.LogGroup(this, "esgeneLogGroup", {
+      logGroupName: "/ecs/esgene",
       retention: log.RetentionDays.ONE_WEEK,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     const logDriver = new ecs.AwsLogDriver({
       logGroup: logGroup,
-      streamPrefix: "NucleusService",
+      streamPrefix: "ESGeneService",
     });
 
     // ECR Repository
     const ecRRepo = ecr.Repository.fromRepositoryName(
       this,
-      "nucleusECRRepo",
-      "nucleus" // replace with your repository name
+      "esgeneECRRepo",
+      "esgene-rag" // replace with your repository name
     );
 
     // Task Container
-    const container = taskDef.addContainer("nucleusContainer", {
+    const container = taskDef.addContainer("esgeneContainer", {
       image: ecs.ContainerImage.fromRegistry(
-        "public.ecr.aws/y9j1k7y7/nucleus:latest"
+        "public.ecr.aws/y9j1k7y7/esgene-rag:latest"
       ),
       memoryLimitMiB: 512,
       logging: logDriver,
@@ -94,26 +94,26 @@ export class InfrastructureStack extends cdk.Stack {
     // Security Groups
     const securityGroup = new ec2.SecurityGroup(this, "SecurityGroup", {
       allowAllOutbound: true,
-      securityGroupName: "sgnucleus",
+      securityGroupName: "sg",
       vpc: vpc,
     });
     securityGroup.connections.allowFromAnyIpv4(ec2.Port.tcp(containerPort));
 
     // Fargate Service
-    const fargateService = new ecs.FargateService(this, "nucleusService", {
+    const fargateService = new ecs.FargateService(this, "esgeneService", {
       cluster: ecsCluster,
       taskDefinition: taskDef,
       assignPublicIp: false,
       desiredCount: 2,
       securityGroups: [securityGroup],
       cloudMapOptions: {
-        name: "nucleusService",
+        name: "esgeneService",
         cloudMapNamespace: dnsNamespace,
       },
     });
 
     // ALB
-    const lb = new elbv2.ApplicationLoadBalancer(this, "NucleusALB", {
+    const lb = new elbv2.ApplicationLoadBalancer(this, "ESGeneALB", {
       vpc,
       internetFacing: false,
     });
@@ -124,7 +124,7 @@ export class InfrastructureStack extends cdk.Stack {
     });
 
     // Target Group
-    const targetGroup = this.httpApiListener.addTargets("nucleusTargetGroup", {
+    const targetGroup = this.httpApiListener.addTargets("esgeneTargetGroup", {
       port: containerPort,
       targets: [fargateService],
       healthCheck: {

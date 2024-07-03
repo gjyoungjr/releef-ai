@@ -10,11 +10,10 @@ const env: cdk.Environment = envConfig.env;
 
 console.log(envConfig);
 
-const infrastructureStack = new InfrastructureStack(app, "FileIngestorStack", {
+const infrastructureStack = new InfrastructureStack(app, "RAGPipelineStack", {
   env,
   envConfig,
-  stackName: "NucleusAPI",
-  description:
-    "Sets up the basic infrastructure for Nucleus AI agent as API Services.",
+  stackName: "RAGPipeline",
+  description: "RAG Piplines",
   containerPort: 8000,
 });
