@@ -1,8 +1,9 @@
-langchain
-langchain-openai
-langchain_core
+llama-index
+llama-index-core
+llama-index-embeddings-openai
+pinecone-client
+llama-index-vector-stores-pinecone
 python-dotenv
 flask
 boto3
-pymupdf
 urllib3==1.26.7
