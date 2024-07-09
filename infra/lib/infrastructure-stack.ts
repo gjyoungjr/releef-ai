@@ -81,7 +81,7 @@ export class InfrastructureStack extends cdk.Stack {
     // Task Container
     const container = taskDef.addContainer("esgeneContainer", {
       image: ecs.ContainerImage.fromRegistry(
-        "public.ecr.aws/y9j1k7y7/esgene-rag:latest"
+        "public.ecr.aws/y9j1k7y7/esgene-rag:1.0.0"
       ),
       memoryLimitMiB: 512,
       logging: logDriver,

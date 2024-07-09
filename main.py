@@ -14,6 +14,7 @@ def default():
 
 @app.route('/health')
 def health_check():
+    print('healthy..')
     return 'OK', 200
 
 
