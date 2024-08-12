@@ -1,4 +1,5 @@
 from llama_index.core.node_parser import SentenceSplitter
+from llama_index.core import VectorStoreIndex
 
 # TODO: Add 'typing' to func args
 def create_embedding(document): 
@@ -8,4 +9,7 @@ def create_embedding(document):
     
     return nodes
     
-   
+ # TODO: Test function logic   
+def init_vector_store(document): 
+    vector_store = VectorStoreIndex.from_documents(documents=document)
+    return vector_store
