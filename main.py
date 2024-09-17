@@ -1,11 +1,13 @@
 from flask import Flask
-from api import query_blueprint, analyze_blueprint
+from api import query_blueprint, analyze_blueprint, embed_blueprint
 
 app = Flask(__name__)
 
 # Register the blueprints/routes
 app.register_blueprint(query_blueprint, url_prefix='/')
 app.register_blueprint(analyze_blueprint, url_prefix='/')
+app.register_blueprint(embed_blueprint, url_prefix='/')
+
 
 @app.route('/')
 def default():
