@@ -9,7 +9,7 @@ flask
 boto3
 urllib3==1.26.7
 langchain 
-langchain_openai
+langchain-openai
 requests 
 pandas 
 beautifulsoup4
