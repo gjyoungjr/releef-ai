@@ -3,7 +3,7 @@ import re
 from bs4 import BeautifulSoup
 import pandas as pd
 from bs4.element import Tag
-
+import networkx as nx
 
 CSRD_REPORT_URL = 'https://eur-lex.europa.eu/legal-content/EN/TXT/HTML/?uri=CELEX:02013L0034-20240109&qid=1712714544806'
 html_page = requests.get(CSRD_REPORT_URL).text
@@ -84,56 +84,64 @@ def get_paragraphs(article_section):
 
 
 
-main_content = BeautifulSoup(html_page, 'html.parser')
-directive_section = get_directive_section(main_content)
-directive_name = get_directive_name(directive_section)
-content_section = get_content_section(main_content)
 
-for chapter_section in get_chapter_sections(content_section):
-  chapter_id = get_chapter_id(chapter_section)
-  chapter_name = get_chapter_name(chapter_section)
-  articles = len(get_article_sections(chapter_section))
-  print(f'Chapter {chapter_id}: {chapter_name}')
-  print(f'{articles} article(s)')
-  print('')
+def build_nodes_and_edges(content_section, directive_name):
+  """Builds nodes and edges to create a graph representation of the directive"""
+  nodes = []
+  edges = []
+
+  nodes.append(['0', 'CSRD', directive_name, 'DIRECTIVE'])
   
-  
-nodes = []
-edges = []
+  for chapter_section in get_chapter_sections(content_section):
+    chapter_id = get_chapter_id(chapter_section)
+    chapter_name = get_chapter_name(chapter_section)
+    # level 1, chapter
+    # chapters are included in root node
+    nodes.append([ chapter_id, f'Chapter {chapter_id}', chapter_name, 'CHAPTER'])
+    edges.append(['0', f'{chapter_id}', 'CONTAINS'])
 
-nodes.append(['0', 'CSRD', directive_name, 'DIRECTIVE'])
+    for article_section in get_article_sections(chapter_section):
+      article_id = get_article_id(article_section)
+      article_name = get_article_name(article_section)
+      article_paragraphs = get_paragraphs(article_section)
+      # level 2, article
+      # articles are included in chapters
+      nodes.append([f'{chapter_id}.{article_id}', f'Article {article_id}', article_name, 'ARTICLE'])
+      edges.append([chapter_id, f'{chapter_id}.{article_id}', 'CONTAINS'])
 
-
-for chapter_section in get_chapter_sections(content_section):
-
-  chapter_id = get_chapter_id(chapter_section)
-  chapter_name = get_chapter_name(chapter_section)
-
-  # level 1, chapter
-  # chapters are included in root node
-  nodes.append([ chapter_id, f'Chapter {chapter_id}', chapter_name, 'CHAPTER'])
-  edges.append(['0', f'{chapter_id}', 'CONTAINS'])
-
-  for article_section in get_article_sections(chapter_section):
-    article_id = get_article_id(article_section)
-    article_name = get_article_name(article_section)
-    article_paragraphs = get_paragraphs(article_section)
-
-    # level 2, article
-    # articles are included in chapters
-    nodes.append([f'{chapter_id}.{article_id}', f'Article {article_id}', article_name, 'ARTICLE'])
-    edges.append([chapter_id, f'{chapter_id}.{article_id}', 'CONTAINS'])
-
-    for paragraph_id, paragraph_text in article_paragraphs.items():
-
-      # level 3, paragraph
-      # paragraphs are included in articles
-      nodes.append([f'{chapter_id}.{article_id}.{paragraph_id}', f'Article {article_id}({paragraph_id})', paragraph_text, 'PARAGRAPH'])
-      edges.append([f'{chapter_id}.{article_id}', f'{chapter_id}.{article_id}.{paragraph_id}', 'CONTAINS'])
+      for paragraph_id, paragraph_text in article_paragraphs.items():
+        # level 3, paragraph
+        # paragraphs are included in articles
+        nodes.append([f'{chapter_id}.{article_id}.{paragraph_id}', f'Article {article_id}({paragraph_id})', paragraph_text, 'PARAGRAPH'])
+        edges.append([f'{chapter_id}.{article_id}', f'{chapter_id}.{article_id}.{paragraph_id}', 'CONTAINS'])
+        
+  return nodes, edges
+      
       
 
-nodes_df = pd.DataFrame(nodes, columns=['id', 'label', 'content', 'group'])
-edges_df = pd.DataFrame(edges, columns=['src', 'dst', 'label'])
+
+def main():
+  main_content = BeautifulSoup(html_page, 'html.parser')
+  directive_section = get_directive_section(main_content)
+  directive_name = get_directive_name(directive_section)
+  content_section = get_content_section(main_content)
+  
+  nodes, edges =build_nodes_and_edges(content_section, directive_name)
+  
+  nodes_df = pd.DataFrame(nodes, columns=['id', 'label', 'content', 'group'])
+  edges_df = pd.DataFrame(edges, columns=['src', 'dst', 'label'])
+  
+  csrd_graph = nx.DiGraph()
+
+  for i, n in nodes_df.iterrows():
+    csrd_graph.add_node(n['id'], label=n['label'], title=n['content'], group=n['group'])
+
+  for i, e in edges_df.iterrows():
+    if e['label'] == 'CONTAINS':
+      csrd_graph.add_edge(e['src'], e['dst'], label=e['label'])
+
+  print(csrd_graph)
 
 
-print(nodes_df)
+if __name__ == '__main__':
+    main()

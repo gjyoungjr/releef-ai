@@ -4,6 +4,13 @@ llama-index-embeddings-openai
 pinecone-client
 llama-index-vector-stores-pinecone
 python-dotenv
+langchain
 flask
 boto3
 urllib3==1.26.7
+langchain 
+langchain_openai
+requests 
+pandas 
+beautifulsoup4
+networkx
