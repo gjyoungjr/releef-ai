@@ -120,7 +120,8 @@ def build_nodes_and_edges(content_section, directive_name):
       
 
 
-def main():
+def generate_csrd_graph():
+  """Generates a graph representation of the CSRD directive"""
   main_content = BeautifulSoup(html_page, 'html.parser')
   directive_section = get_directive_section(main_content)
   directive_name = get_directive_name(directive_section)
@@ -139,9 +140,14 @@ def main():
   for i, e in edges_df.iterrows():
     if e['label'] == 'CONTAINS':
       csrd_graph.add_edge(e['src'], e['dst'], label=e['label'])
+      
+  return csrd_graph
 
-  print(csrd_graph)
 
 
+def main():
+  csrd_graph = generate_csrd_graph()
+  print(csrd_graph.nodes(data=True))
+  
 if __name__ == '__main__':
     main()

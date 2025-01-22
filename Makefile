@@ -1,17 +1,18 @@
 .EXPORT_ALL_VARIABLES:
 
-AWS_ACCOUNT=654654323576
-AWS_PROFILE=perennial
-REGION=us-east-1
+AWS_PROFILE=rekha-ai
+FRONTEND_DIR := packages/frontend
+BACKEND_DIR := packages/backend
+REGION := us-east-2
 ECR_REPO=public.ecr.aws/y9j1k7y7
-IMAGE_NAME=esgene-rag
+IMAGE_NAME=releef-agents
 VERSION=1.0.0
 
 ## docker run -p 8000:8000 esgene-rag  
 
 # Build and push docker image to ECR 
 docker-login:
-	aws  ecr-public get-login-password --region ${REGION} --profile ${AWS_PROFILE} | docker login --username AWS --password-stdin ${ECR_REPO}
+	aws  ecr-public get-login-password --region us-east-1 --profile ${AWS_PROFILE} | docker login --username AWS --password-stdin public.ecr.aws
 
 docker-build: 
 	docker build -f ./Dockerfile -t ${IMAGE_NAME} .
