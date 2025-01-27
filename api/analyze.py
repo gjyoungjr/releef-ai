@@ -1,18 +1,15 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from dotenv import load_dotenv
 from typing import Dict, List
 from utilities.csrd_graph import generate_csrd_graph
 from langchain.agents import Tool, AgentExecutor, LLMSingleActionAgent, AgentOutputParser
 from langchain.prompts import StringPromptTemplate
-from langchain.embeddings import OpenAIEmbeddings
+from langchain_core.embeddings import OpenAIEmbeddings
 from langchain import OpenAI, LLMChain
-from langchain.tools import DuckDuckGoSearchRun
-from langchain.vectorstores import FAISS
-
+from langchain_core.vectorstores import FAISS
 from typing import List, Union
 from langchain.schema import AgentAction, AgentFinish
-import re
-import langchain
+
 load_dotenv()
 
 analyze_blueprint = Blueprint("analyze", __name__)
