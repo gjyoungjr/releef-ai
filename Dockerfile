@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 python:3.10-slim as build 
+FROM --platform=linux/amd64 python:3.12.8-slim as build 
 
 COPY . .
 

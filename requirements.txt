@@ -1,9 +1,9 @@
 python-dotenv
-langchain
 flask
 boto3
 urllib3==1.26.7
-langchain 
+langchain
+langchain-community
 langchain-openai
 requests 
 pandas 
