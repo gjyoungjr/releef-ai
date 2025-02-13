@@ -14,59 +14,6 @@ from .prompts import CSRD_AGENT_PROMPT_TEMPLATE as PROMPT_TEMPLATE
 
 load_dotenv()
 
-# CSRD_GRAPH = generate_csrd_graph()
-
-# text = []
-# metadata = []
-
-# for node_id, node_data in CSRD_GRAPH.nodes(data=True):
-#     text.append(node_data['title'])
-#     metadata.append({'id': node_id, 'label': node_data['label']})
-    
-# embeddings = OpenAIEmbeddings()
-# CSRD_VECTOR_STORE = FAISS.from_texts(text, embeddings, metadatas=metadata)
-
-# def search_csrd(query: str) -> str:
-#     csrd_graph = generate_csrd_graph()
-    
-#     csrd_results = CSRD_VECTOR_STORE.similarity_search_with_score(query)
-#     print(csrd_results)
-    
-#     response = []
-    
-#     for doc, score in csrd_results:
-#         doc_id = doc.metadata['id']
-#         doc_label = doc.metadata['label']
-#         doc_content = doc.page_content
-#         doc_references = ','.join(list(csrd_graph.neighbors(doc_id)))
-        
-#         response.append(
-#             f'''######
-#             [Article ID]: {doc_id}
-#             [Article Name]: {doc_label}
-#             [Article Content]: {doc_content}
-#             [References]: {doc_references}
-#             '''
-#         )
-        
-#     return "\n\n".join(response) 
-
-   
-# def search_reference(article_reference: str) -> str: 
-#     csrd_graph = generate_csrd_graph()
-
-#     result = csrd_graph.nodes[article_reference]
-#     doc_references = ','.join(list(csrd_graph.neighbors(article_reference)))
-#     doc_content = result['title']
-#     doc_label = result['label']
-  
-#     return f'''###
-#     [Articel ID]: {article_reference}
-#     [Article Name]: {doc_label}
-#     [Article Content]: {doc_content}
-#     [References]: {doc_references}
-# '''
-
 class CSRDSearch:
     def __init__(self):
         self.csrd_graph = generate_csrd_graph()
